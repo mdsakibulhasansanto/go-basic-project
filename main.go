@@ -1,8 +1,10 @@
 package main
 
 import (
+	"final-project/cache"
 	"final-project/db"
-	handlers "final-project/handler"
+	"final-project/handler"
+	"final-project/radis"
 	"final-project/repositories"
 	"final-project/services"
 
@@ -10,17 +12,28 @@ import (
 )
 
 func main() {
-	database, err := db.NewMySqlDB()
+	gin.SetMode(gin.ReleaseMode)
+
+	dbConn, err := db.NewMySqlDB()
 	if err != nil {
 		panic(err)
 	}
 
-	userRepo := repositories.NewUserRepository(database)
+	redisClient, err := radis.NewRedisClient()
+	if err != nil {
+		panic(err)
+	}
+
+	redisCache := cache.NewRedisCache(redisClient)
+	baseRepo := repositories.NewMySQLUserRepository(dbConn)
+	userRepo := repositories.NewRedisMySQLUserRepository(baseRepo, redisCache)
+
 	authService := services.NewAuthService(userRepo)
-	authHandler := handlers.NewAuthHandler(authService)
+	authHandler := handler.NewAuthHandler(authService)
 
 	router := gin.Default()
 	router.POST("/register", authHandler.Register)
+	router.GET("/user", authHandler.GetUserByEmail)
 
 	router.Run(":8080")
 }

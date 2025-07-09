@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"final-project/services"
@@ -18,34 +18,35 @@ type RegisterRequest struct {
 }
 
 func NewAuthHandler(service *services.AuthService) *AuthHandler {
-	return &AuthHandler{
-		service: service,
-	}
+	return &AuthHandler{service: service}
 }
 
-// ✅ Register API
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var request RegisterRequest
-
-	// JSON binding validation
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": "Validation error",
-		})
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Validation error"})
 		return
 	}
 
-	// Call service to register user
-	err := h.service.RegisterUser(request.Username, request.Email, request.Password)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	if err := h.service.RegisterUser(request.Username, request.Email, request.Password); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Success response
+	ctx.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+}
+
+func (h *AuthHandler) GetUserByEmail(ctx *gin.Context) {
+	email := ctx.Query("email")
+	user, err := h.service.GetUserByEmail(email)
+	if err != nil || user == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "User registered successfully",
+		"id":       user.Id,
+		"username": user.Username,
+		"email":    user.Email,
 	})
 }

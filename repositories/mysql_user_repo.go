@@ -6,17 +6,15 @@ import (
 	"fmt"
 )
 
-type UserRepository struct {
+type MySQLUserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository{
-		db: db,
-	}
+func NewMySQLUserRepository(db *sql.DB) *MySQLUserRepository {
+	return &MySQLUserRepository{db: db}
 }
 
-func (r *UserRepository) Create(user models.User) error {
+func (r *MySQLUserRepository) Create(user models.User) error {
 	query := "INSERT INTO users (username, email, password, is_verified, verification_token) VALUES (?, ?, ?, ?, ?)"
 	_, err := r.db.Exec(query, user.Username, user.Email, user.PasswordHash, user.IsVerified, user.VerificationToken)
 	if err != nil {
@@ -25,17 +23,14 @@ func (r *UserRepository) Create(user models.User) error {
 	return nil
 }
 
-func (r *UserRepository) GetByEmail(email string) (*models.User, error) {
+func (r *MySQLUserRepository) GetByEmail(email string) (*models.User, error) {
 	query := "SELECT id, username, email, password, is_verified, verification_token FROM users WHERE email = ?"
 	row := r.db.QueryRow(query, email)
 
 	var user models.User
 	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.PasswordHash, &user.IsVerified, &user.VerificationToken)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("error retrieving user by email: %v", err)
+		return nil, err
 	}
 
 	return &user, nil

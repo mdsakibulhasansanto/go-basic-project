@@ -1,60 +1,43 @@
 package services
 
 import (
+	"errors"
 	"final-project/models"
 	"final-project/repositories"
-	"final-project/utils"
-	"fmt"
 
-	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	userRepo *repositories.UserRepository
+	repo repositories.UserRepositoryInterface
 }
 
-func NewAuthService(userRepo *repositories.UserRepository) *AuthService {
-	return &AuthService{
-		userRepo: userRepo,
-	}
+func NewAuthService(repo repositories.UserRepositoryInterface) *AuthService {
+	return &AuthService{repo: repo}
 }
 
 func (s *AuthService) RegisterUser(username, email, password string) error {
-	// ✅ Hash password
-	hashedPassword, err := utils.HashPassword(password)
+	existingUser, _ := s.repo.GetByEmail(email)
+	if existingUser != nil {
+		return errors.New("user already exists with this email")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
-	// ✅ Generate verification token
-	verificationToken := uuid.New().String()
-
-	// ✅ Check if user already exists
-	existingUser, err := s.userRepo.GetByEmail(email)
-	if err != nil {
-		return fmt.Errorf("error checking existing user: %v", err)
-	}
-	if existingUser != nil {
-		return fmt.Errorf("user already exists with email: %s", email)
-	}
-
-	// ✅ Create user model
 	user := models.User{
 		Username:          username,
 		Email:             email,
-		PasswordHash:      hashedPassword,
+		PasswordHash:      string(hashedPassword),
 		IsVerified:        false,
-		VerificationToken: verificationToken,
+		VerificationToken: "token123",
 	}
 
-	// ✅ Save to database
-	if err := s.userRepo.Create(user); err != nil {
-		return fmt.Errorf("failed to create user: %v", err)
-	}
-
-	return nil
+	return s.repo.Create(user)
 }
 
 func (s *AuthService) GetUserByEmail(email string) (*models.User, error) {
-	return s.userRepo.GetByEmail(email)
+	return s.repo.GetByEmail(email)
 }
