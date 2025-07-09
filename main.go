@@ -34,6 +34,7 @@ func main() {
 	router := gin.Default()
 	router.POST("/register", authHandler.Register)
 	router.GET("/user", authHandler.GetUserByEmail)
+	router.GET("/login", authHandler.Login)
 
 	router.Run(":8080")
 }

@@ -17,6 +17,11 @@ type RegisterRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
 func NewAuthHandler(service *services.AuthService) *AuthHandler {
 	return &AuthHandler{service: service}
 }
@@ -34,6 +39,32 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+}
+
+func (h *AuthHandler) Login(ctx *gin.Context) {
+
+	var request LoginRequest
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Validation error"})
+		return
+	}
+
+	user, error := h.service.Login(request.Email, request.Password)
+	if error != nil {
+		ctx.JSON(500, gin.H{
+			"error": "Invalid email or password",
+		})
+		return
+	}
+
+	ctx.JSON(201, gin.H{
+		"message": "Login successfull",
+		"user ": gin.H{
+			"id":       user.Id,
+			"username": user.Username,
+			"email":    user.Email,
+		},
+	})
 }
 
 func (h *AuthHandler) GetUserByEmail(ctx *gin.Context) {

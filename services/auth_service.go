@@ -38,6 +38,22 @@ func (s *AuthService) RegisterUser(username, email, password string) error {
 	return s.repo.Create(user)
 }
 
+func (s *AuthService) Login(email, password string) (*models.User, error) {
+	user, err := s.repo.GetByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	return user, nil
+}
+
 func (s *AuthService) GetUserByEmail(email string) (*models.User, error) {
 	return s.repo.GetByEmail(email)
 }
