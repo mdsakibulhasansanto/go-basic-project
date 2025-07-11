@@ -3,9 +3,9 @@ package models
 import "gorm.io/gorm"
 
 type Product struct {
-	gorm.Model  // Includes ID, CreatedAt, UpdatedAt, DeletedAt
-	Name        string
-	Description string
+	gorm.Model
+	Name        string `gorm:"size:255;not null"`
+	Description string `gorm:"type:text"`
 	Price       float64
-	UserEmail   string
+	UserEmail   string `gorm:"index;not null"`
 }

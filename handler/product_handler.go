@@ -13,39 +13,24 @@ type ProductHandler struct {
 }
 
 func NewProductHandler(service *services.ProductService) *ProductHandler {
-	return &ProductHandler{
-		service: service,
-	}
+	return &ProductHandler{service: service}
 }
 
-func (h *ProductHandler) Create(ctx *gin.Context) {
+func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	var product models.Product
 
-	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-
-	userEmail := ctx.GetString("email")
-	if userEmail == "" {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": "Unauthorized",
-		})
-		return
-	}
-
-	product.UserEmail = userEmail
 
 	if err := h.service.Create(&product); err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Product created successfully",
+		"product": product,
 	})
 }

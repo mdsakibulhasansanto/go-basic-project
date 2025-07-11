@@ -6,17 +6,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type ProductRepository struct {
+type ProductRepository interface {
+	Create(product *models.Product) error
+}
+
+type MySQLProductRepository struct {
 	db *gorm.DB
 }
 
-func NewProductRepository(db *gorm.DB) *ProductRepository {
-
-	return &ProductRepository{
-		db: db,
-	}
+func NewMySQLProductRepository(db *gorm.DB) ProductRepository {
+	return &MySQLProductRepository{db: db}
 }
 
-func (r *ProductRepository) Create(product *models.Product) error {
+func (r *MySQLProductRepository) Create(product *models.Product) error {
 	return r.db.Create(product).Error
 }

@@ -1,5 +1,9 @@
 package models
 
+import "gorm.io/gorm"
+
+/*
+
 type User struct {
 	Id                int
 	Username          string
@@ -9,6 +13,16 @@ type User struct {
 	VerificationToken string
 }
 
+*/
+
+type User struct {
+	gorm.Model
+	Username          string `gorm:"size:100;not null;unique"`
+	Email             string `gorm:"size:100;not null;unique"`
+	PasswordHash      string `gorm:" column :password;not null"`
+	IsVerified        bool   `gorm:"default:false"`
+	VerificationToken string `gorm:"size:255"`
+}
 
 /*
 

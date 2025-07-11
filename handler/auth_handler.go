@@ -69,7 +69,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	ctx.JSON(201, gin.H{
 		"message": "Login successfull",
 		"user ": gin.H{
-			"id":       user.Id,
+			"id":       user.ID,
 			"username": user.Username,
 			"email":    user.Email,
 			"token":    token,
@@ -88,7 +88,7 @@ func (h *AuthHandler) GetUserByEmail(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"id":       user.Id,
+		"id":       user.ID,
 		"username": user.Username,
 		"email":    user.Email,
 		"token":    user.VerificationToken,

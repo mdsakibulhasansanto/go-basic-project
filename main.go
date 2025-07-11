@@ -49,9 +49,11 @@ func main() {
 	*/
 
 	// Product route handler & dependency
-	productRepo := repositories.NewProductRepository(gormDb)
+	productRepo := repositories.NewMySQLProductRepository(gormDb)
 	productService := services.NewProductService(productRepo)
 	productHandler := handler.NewProductHandler(productService)
 	routes.RegisterProductRoutes(router, productHandler)
 	router.Run(":8080")
 }
+
+// http://localhost:8080/register
