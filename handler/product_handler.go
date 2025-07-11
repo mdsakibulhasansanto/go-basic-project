@@ -24,13 +24,21 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	product.UserEmail = email.(string)
+
+	// Service call
 	if err := h.service.Create(&product); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Product created successfully",
+		"message": "Product created",
 		"product": product,
 	})
 }
