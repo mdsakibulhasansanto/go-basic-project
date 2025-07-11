@@ -32,7 +32,7 @@ func (s *AuthService) RegisterUser(username, email, password string) error {
 		Email:             email,
 		PasswordHash:      string(hashedPassword),
 		IsVerified:        false,
-		VerificationToken: "token123",
+		VerificationToken: "123token",
 	}
 
 	return s.repo.Create(user)

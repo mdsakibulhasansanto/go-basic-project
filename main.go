@@ -4,8 +4,10 @@ import (
 	"final-project/cache"
 	"final-project/db"
 	"final-project/handler"
+	"final-project/middlewares"
 	"final-project/radis"
 	"final-project/repositories"
+	"final-project/routes"
 	"final-project/services"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +20,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	gormDb, err := db.NewMySqlGormDB()
 
 	redisClient, err := radis.NewRedisClient()
 	if err != nil {
@@ -33,8 +37,21 @@ func main() {
 
 	router := gin.Default()
 	router.POST("/register", authHandler.Register)
-	router.GET("/user", authHandler.GetUserByEmail)
 	router.GET("/login", authHandler.Login)
 
+	router.GET("/user", middlewares.JWTAuthMiddleware(), authHandler.GetUserByEmail)
+
+	/*
+
+		if err := db.MigrateProductTable(gormDb); err != nil {
+			panic(err)
+		}
+	*/
+
+	// Product route handler & dependency
+	productRepo := repositories.NewProductRepository(gormDb)
+	productService := services.NewProductService(productRepo)
+	productHandler := handler.NewProductHandler(productService)
+	routes.RegisterProductRoutes(router, productHandler)
 	router.Run(":8080")
 }

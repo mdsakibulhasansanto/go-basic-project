@@ -9,6 +9,7 @@ type User struct {
 	VerificationToken string
 }
 
+
 /*
 
 CREATE TABLE users (

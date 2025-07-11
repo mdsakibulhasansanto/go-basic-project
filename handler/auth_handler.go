@@ -2,6 +2,7 @@ package handler
 
 import (
 	"final-project/services"
+	"final-project/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,6 +57,14 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		})
 		return
 	}
+	token, err := utils.GenerateJwt(user.Email)
+
+	if err != nil {
+		ctx.JSON(500, gin.H{
+
+			"error": "Invalid email and password",
+		})
+	}
 
 	ctx.JSON(201, gin.H{
 		"message": "Login successfull",
@@ -63,12 +72,15 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 			"id":       user.Id,
 			"username": user.Username,
 			"email":    user.Email,
+			"token":    token,
 		},
 	})
 }
 
 func (h *AuthHandler) GetUserByEmail(ctx *gin.Context) {
-	email := ctx.Query("email")
+
+	//email := ctx.Query("email")
+	email := ctx.GetString("email")
 	user, err := h.service.GetUserByEmail(email)
 	if err != nil || user == nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -79,5 +91,6 @@ func (h *AuthHandler) GetUserByEmail(ctx *gin.Context) {
 		"id":       user.Id,
 		"username": user.Username,
 		"email":    user.Email,
+		"token":    user.VerificationToken,
 	})
 }
