@@ -9,7 +9,7 @@ import (
 )
 
 func NewMySqlGormDB() (*gorm.DB, error) {
-	dsn := "root:@tcp(127.0.0.1:3306)/go_test_db"
+	dsn := "root:@tcp(127.0.0.1:3306)/go_test_db?parseTime=true"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Println("Error opening database:", err)

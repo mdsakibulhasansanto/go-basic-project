@@ -12,7 +12,7 @@ var DB *sql.DB
 
 func NewMySqlDB() (*sql.DB, error) {
 
-	dsn := "root:@tcp(127.0.0.1:3306)/go_test_db"
+	dsn := "root:@tcp(127.0.0.1:3306)/go_test_db?parseTime=true"
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {

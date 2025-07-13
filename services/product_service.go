@@ -20,3 +20,7 @@ func (s *ProductService) Create(product *models.Product) error {
 func (s *ProductService) GetAllProducts() ([]models.Product, error) {
 	return s.repo.GetAllProducts()
 }
+
+func (s *ProductService) Update(product *models.Product) error {
+	return s.repo.Update(product)
+}

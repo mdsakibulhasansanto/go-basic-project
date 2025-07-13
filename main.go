@@ -53,6 +53,11 @@ func main() {
 	productService := services.NewProductService(productRepo)
 	productHandler := handler.NewProductHandler(productService)
 	routes.RegisterProductRoutes(router, productHandler)
+
+	for _, ri := range router.Routes() {
+		println(ri.Method, ri.Path)
+	}
+
 	router.Run(":8080")
 }
 

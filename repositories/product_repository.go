@@ -26,3 +26,7 @@ func (r *MySQLProductRepository) GetAllProducts() ([]models.Product, error) {
 	}
 	return products, nil
 }
+
+func (r *MySQLProductRepository) Update(product *models.Product) error {
+	return r.db.Save(product).Error
+}

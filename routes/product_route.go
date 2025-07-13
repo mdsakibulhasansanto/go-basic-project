@@ -14,4 +14,5 @@ func RegisterProductRoutes(router *gin.Engine, handler *handler.ProductHandler) 
 
 	authGroup.POST("/create", handler.CreateProduct)
 	authGroup.GET("/all", handler.GetAllProducts)
+	authGroup.POST("/update/:id", handler.UpdateProduct)
 }
