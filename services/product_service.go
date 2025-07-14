@@ -22,5 +22,21 @@ func (s *ProductService) GetAllProducts() ([]models.Product, error) {
 }
 
 func (s *ProductService) Update(product *models.Product) error {
+
 	return s.repo.Update(product)
+}
+
+// Delete removes a product by its ID.
+func (s *ProductService) Delete(id uint) error {
+	// TODO: Implement actual deletion logic, e.g., using a repository or database.
+	// For now, return nil or an error if not found.
+	// Example:
+	// err := s.repo.DeleteByID(id)
+	// if err != nil {
+	//     return err
+	// }
+	// return nil
+
+	// Placeholder implementation:
+	return nil
 }
