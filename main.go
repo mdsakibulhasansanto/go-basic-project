@@ -34,12 +34,14 @@ func main() {
 
 	authService := services.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
+	userHandler := handler.NewUserHandler(authService)
 
 	router := gin.Default()
 	router.POST("/register", authHandler.Register)
 	router.GET("/login", authHandler.Login)
 
 	router.GET("/user", middlewares.JWTAuthMiddleware(), authHandler.GetUserByEmail)
+	routes.RegisterUserRoutes(router, userHandler)
 
 	/*
 

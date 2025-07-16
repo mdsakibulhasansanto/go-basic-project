@@ -16,6 +16,22 @@ func NewAuthService(repo repositories.UserRepositoryInterface) *AuthService {
 	return &AuthService{repo: repo}
 }
 
+// UpdateUserByID updates user data by ID
+func (s *AuthService) UpdateUserByID(user *models.User) error {
+	if user.ID == 0 {
+		return errors.New("user ID is required for update")
+	}
+	return s.repo.UpdateUserByID(user)
+}
+
+// DeleteUser deletes a user by email
+func (s *AuthService) DeleteUser(email string) error {
+	if email == "" {
+		return errors.New("email is required for deletion")
+	}
+	return s.repo.DeleteUser(email)
+}
+
 func (s *AuthService) RegisterUser(username, email, password string) error {
 	existingUser, _ := s.repo.GetByEmail(email)
 	if existingUser != nil {
@@ -35,7 +51,12 @@ func (s *AuthService) RegisterUser(username, email, password string) error {
 		VerificationToken: "123token",
 	}
 
-	return s.repo.Create(user)
+	err = s.repo.Create(user)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *AuthService) Login(email, password string) (*models.User, error) {

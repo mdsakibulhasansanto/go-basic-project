@@ -40,3 +40,23 @@ func (r *RedisMySQLUserRepository) GetByEmail(email string) (*models.User, error
 
 	return user, nil
 }
+
+// UpdateUserByID updates user data in the base repository and invalidates the cache
+func (r *RedisMySQLUserRepository) UpdateUserByID(user *models.User) error {
+	err := r.repo.UpdateUserByID(user)
+	if err == nil {
+		cacheKey := "user:" + user.Email
+		r.cache.Set(cacheKey, "", 0) // Invalidate cache (could also delete)
+	}
+	return err
+}
+
+// DeleteUser deletes user from the base repository and invalidates the cache
+func (r *RedisMySQLUserRepository) DeleteUser(email string) error {
+	err := r.repo.DeleteUser(email)
+	if err == nil {
+		cacheKey := "user:" + email
+		r.cache.Set(cacheKey, "", 0) // Invalidate cache (could also delete)
+	}
+	return err
+}

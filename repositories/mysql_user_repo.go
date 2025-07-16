@@ -35,3 +35,23 @@ func (r *MySQLUserRepository) GetByEmail(email string) (*models.User, error) {
 
 	return &user, nil
 }
+
+// UpdateUserByID updates user data based on user ID
+func (r *MySQLUserRepository) UpdateUserByID(user *models.User) error {
+	query := "UPDATE users SET username=?, email=?, password=?, is_verified=?, verification_token=? WHERE id=?"
+	_, err := r.db.Exec(query, user.Username, user.Email, user.PasswordHash, user.IsVerified, user.VerificationToken, user.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteUser deletes a user by email
+func (r *MySQLUserRepository) DeleteUser(email string) error {
+	query := "DELETE FROM users WHERE email=?"
+	_, err := r.db.Exec(query, email)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -17,9 +17,9 @@ func NewProductHandler(service *services.ProductService) *ProductHandler {
 	return &ProductHandler{service: service}
 }
 
+// CreateProduct handles product creation
 func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	var product models.Product
-
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
@@ -32,7 +32,6 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	}
 	product.UserEmail = email.(string)
 
-	// Service call
 	if err := h.service.Create(&product); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
 		return
@@ -42,6 +41,23 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		"message": "Product created",
 		"product": product,
 	})
+}
+
+func (h *ProductHandler) DeleteProduct(c *gin.Context) {
+	idParam := c.Param("id")
+	idInt, err := strconv.Atoi(idParam)
+	if err != nil || idInt <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		return
+	}
+
+	err = h.service.Delete(uint(idInt))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }
 
 func (h *ProductHandler) GetAllProducts(c *gin.Context) {
@@ -90,20 +106,4 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 		"message": "Product updated",
 		"product": product,
 	})
-}
-
-func (h *ProductHandler) DeleteProduct(c *gin.Context) {
-	idParam := c.Param("id")
-	idInt, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
-
-	if err := h.service.Delete(uint(idInt)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Product deleted"})
 }

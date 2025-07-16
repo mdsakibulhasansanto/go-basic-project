@@ -28,5 +28,14 @@ func (r *MySQLProductRepository) GetAllProducts() ([]models.Product, error) {
 }
 
 func (r *MySQLProductRepository) Update(product *models.Product) error {
-	return r.db.Save(product).Error
+	result := r.db.Model(&models.Product{}).Where("id = ?", product.ID).Updates(product)
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return result.Error
+}
+
+// Delete deletes a product by its ID
+func (r *MySQLProductRepository) Delete(id uint) error {
+	return r.db.Delete(&models.Product{}, id).Error
 }
