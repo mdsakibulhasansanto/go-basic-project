@@ -4,9 +4,9 @@
 A Go (Golang) web app using the Gin framework, designed with a modular and clean architecture. It includes user authentication,product management, and Redis caching.
 
  🚀 Key Features
- 🔐 JWT Authentication** for secure endpoints
- 📦 Product CRUD** operations
- 🗃️ MySQL database with **GORM** ORM
+ 🔐 JWT Authentication for secure endpoints
+ 📦 Product CRUD operations
+ 🗃️ MySQL database with GORM ORM
  ⚡ Redis caching for performance
  🧱 Modular code structure: handler, service, repo, etc.
 
